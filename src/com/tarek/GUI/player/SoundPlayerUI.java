@@ -1,31 +1,29 @@
-package com.tarek.GUI;
+package com.tarek.GUI.player;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class SoundPlayerUI extends JFrame {
+public class SoundPlayerUI extends JPanel {
   JButton start_btn = new JButton("Start recording");
   JButton stop_btn = new JButton("Stop recording");
   JButton pause_btn = new JButton("Pause");
   JCheckBox echo = new JCheckBox("Echo", true);
 
   public SoundPlayerUI() {
+    super();
     init_gui();
+    setPreferredSize(new Dimension(500, 200));
     setSize(500, 200);
-    setResizable(false);
-    setLocationRelativeTo(null);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setVisible(true);
   }
 
   private void init_gui() {
     JPanel panel = build_button_panel();
-    getContentPane().add(panel, BorderLayout.SOUTH);
+    add(panel, BorderLayout.SOUTH);
   }
 
   private JPanel build_button_panel() {
