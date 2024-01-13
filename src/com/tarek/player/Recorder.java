@@ -9,7 +9,7 @@ import javax.swing.SwingWorker;
 public class Recorder implements IRecorder {
   private boolean recording = false;
   private ByteArrayInputStream input_buffer;
-  private TargetDataLine line;
+  private TargetDataLine target_line;
   private SourceDataLine source_line;
   private boolean echo = true;
   private SwingWorker worker;
@@ -17,7 +17,8 @@ public class Recorder implements IRecorder {
 
   public Recorder() throws Exception {
     input_buffer = new ByteArrayInputStream(new byte[BUF_SIZE]);
-    line = (TargetDataLine) AudioSystem.getLine(PlayerHelper.build_info(TargetDataLine.class));
+    target_line =
+        (TargetDataLine) AudioSystem.getLine(PlayerHelper.build_info(TargetDataLine.class));
     source_line =
         (SourceDataLine) AudioSystem.getLine(PlayerHelper.build_info(SourceDataLine.class));
     source_line.open();
@@ -26,22 +27,21 @@ public class Recorder implements IRecorder {
 
   @Override
   public boolean isOpen() {
-    return line.isOpen();
+    return target_line.isOpen();
   }
 
   @Override
   public boolean isRecording() {
-    // TODO Auto-generated method stub
     return false;
   }
 
   @Override
   public void start() throws Exception {
-    if (!line.isOpen()) {
-      line.open();
+    if (!target_line.isOpen()) {
+      target_line.open();
     }
-    line.flush();
-    line.start();
+    target_line.flush();
+    target_line.start();
     if (is_echo()) {
       if (!source_line.isOpen()) {
         source_line.open();
@@ -55,7 +55,7 @@ public class Recorder implements IRecorder {
             int byte_count = 0;
             int bytes = 0;
             byte[] buf = new byte[BUF_SIZE];
-            while (((bytes = line.read(buf, 0, BUF_SIZE))) != -1) {
+            while (((bytes = target_line.read(buf, 0, BUF_SIZE))) != -1) {
               byte_count += bytes;
               if (is_echo()) {
                 source_line.write(buf, 0, BUF_SIZE);
@@ -69,8 +69,9 @@ public class Recorder implements IRecorder {
 
   @Override
   public void pause() {
-    if (line.isOpen()) {
-      line.stop();
+    if (target_line.isOpen()) {
+      target_line.stop();
+      target_line.flush();
       source_line.stop();
       source_line.flush();
     }
@@ -78,11 +79,11 @@ public class Recorder implements IRecorder {
 
   @Override
   public void stop() {
-    if (line.isOpen()) {
-      line.stop();
+    if (target_line.isOpen()) {
+      target_line.stop();
       source_line.stop();
     }
-    line.close();
+    target_line.close();
     source_line.close();
   }
 
